@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import "./LandingPage.css";
 import LandingHeader from "./components/LandingHeader";
 import HeroSection from "./components/HeroSection";
 import FeaturesSection from "./components/FeaturesSection";
@@ -40,8 +39,11 @@ const LandingPage = ({ onSignInClick }: LandingPageProps) => {
   }, [location.hash]);
 
   return (
-    <div className="landing-page">
-      <a className="skip-link" href="#main-content">
+    <div className="min-h-screen bg-[#0a1628] text-white">
+      <a
+        className="sr-only z-50 rounded-xl bg-[#3b82f6] px-4 py-2 font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+        href="#main-content"
+      >
         Skip to main content
       </a>
       <LandingHeader onSignInClick={onSignInClick} />
