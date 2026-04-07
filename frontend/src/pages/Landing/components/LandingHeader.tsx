@@ -48,7 +48,7 @@ const LandingHeader = ({
               <Link
                 key={link.label}
                 to={link.href}
-                className="relative py-1 text-sm font-medium text-slate-200 transition-colors duration-200 hover:text-white after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#3b82f6] after:transition-all hover:after:w-full"
+                className="relative py-1 text-sm font-medium text-slate-200 transition-colors duration-200 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#3b82f6] after:transition-all hover:text-white hover:after:w-full"
               >
                 {link.label}
               </Link>
@@ -56,7 +56,7 @@ const LandingHeader = ({
               <a
                 key={link.label}
                 href={link.href}
-                className="relative py-1 text-sm font-medium text-slate-200 transition-colors duration-200 hover:text-white after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#3b82f6] after:transition-all hover:after:w-full"
+                className="relative py-1 text-sm font-medium text-slate-200 transition-colors duration-200 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-[#3b82f6] after:transition-all hover:text-white hover:after:w-full"
               >
                 {link.label}
               </a>
@@ -66,7 +66,7 @@ const LandingHeader = ({
           <button
             type="button"
             onClick={onSignInClick}
-            className="rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:from-[#22d3ee] hover:to-[#3b82f6] hover:-translate-y-0.5 hover:shadow-[0_10px_25px_rgba(59,130,246,0.35)]"
+            className="rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:from-[#22d3ee] hover:to-[#3b82f6] hover:shadow-[0_10px_25px_rgba(59,130,246,0.35)]"
           >
             Sign In
           </button>

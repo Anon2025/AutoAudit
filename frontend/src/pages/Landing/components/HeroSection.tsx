@@ -32,8 +32,8 @@ type HeroSectionProps = {
 
 const HeroSection = ({ onSignInClick }: HeroSectionProps) => {
   return (
-    <section className="relative isolate overflow-hidden bg-gradient-to-br from-[#0a1628] via-[#0f1f38] to-[#162a4a] px-[5%] pb-16 pt-8">
-      <div className="pointer-events-none absolute -right-[200px] -top-[200px] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.15)_0%,transparent_70%)]" />
+    <section className="relative isolate overflow-hidden bg-gradient-to-br from-[#0a1628] via-[#0f1f38] to-[#162a4a] px-[5%] pt-8 pb-16">
+      <div className="pointer-events-none absolute -top-[200px] -right-[200px] h-[600px] w-[600px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.15)_0%,transparent_70%)]" />
       <div className="pointer-events-none absolute -bottom-[150px] -left-[100px] h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.2)_0%,transparent_70%)]" />
 
       <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(280px,1fr))] items-center gap-14">
@@ -41,7 +41,7 @@ const HeroSection = ({ onSignInClick }: HeroSectionProps) => {
           <p className="mb-3 text-sm font-semibold tracking-wide text-white">
             AutoAudit Platform
           </p>
-          <h1 className="mb-6 bg-gradient-to-br from-white to-[#3b82f6] bg-clip-text text-[clamp(2.5rem,5vw,3.5rem)] font-bold leading-tight text-transparent">
+          <h1 className="mb-6 bg-gradient-to-br from-white to-[#3b82f6] bg-clip-text text-[clamp(2.5rem,5vw,3.5rem)] leading-tight font-bold text-transparent">
             Access your compliance dashboard and security insights.
           </h1>
           <p className="max-w-[680px] text-[1.2rem] leading-relaxed text-[#b0c4de]">

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 import "./LoginPage.css";
-import "../Landing/LandingPage.css";
 
 import LoginHeader from "./components/LoginHeader";
 import BrandPanel from "./components/BrandPanel";

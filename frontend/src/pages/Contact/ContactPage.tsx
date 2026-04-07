@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "../Landing/LandingPage.css";
 import LandingHeader from "../Landing/components/LandingHeader";
 import LandingFooter from "../Landing/components/LandingFooter";
 import ContactInfoGrid from "./components/ContactInfoGrid";
@@ -30,7 +29,9 @@ const ContactHero: React.FC = () => (
     <div className="pointer-events-none absolute -bottom-[100px] -left-[100px] h-[400px] w-[400px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.1)_0%,transparent_70%)] opacity-90" />
 
     <div className="relative z-[1] mx-auto max-w-[800px]">
-      <p className="section-tag">Contact AutoAudit</p>
+      <p className="mb-3 text-sm font-semibold tracking-wide text-white">
+        Contact AutoAudit
+      </p>
       <h1 className="mb-4 bg-gradient-to-br from-white to-[#3b82f6] bg-clip-text text-[clamp(2.5rem,6vw,3.5rem)] font-bold text-transparent">
         Get in Touch
       </h1>
