@@ -246,7 +246,7 @@ def test_no_orphaned_rego_files(version_label, filename, rego_path):
 
 @pytest.mark.parametrize("collector_id", _ORPHANED)
 def test_no_orphaned_collectors(collector_id):
-    pytest.xfail(
+    pytest.fail(
         f"Collector '{collector_id}' is registered in DATA_COLLECTORS but not referenced "
         f"by any control in any metadata.json"
     )
