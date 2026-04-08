@@ -26,58 +26,58 @@ jobs:
             engine:
               - 'engine/**'
           base: ${{ github.ref }}
-  # DH - comment out only to speed up testing of the consistency checker
-  # analyze:
-  #   name: Security Analysis on (${{ matrix.language }})
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     security-events: write
-  #     packages: read
-  #     actions: read
-  #     contents: read
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       language: ['python']
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-# 
-  #     - name: Initialize CodeQL
-  #       uses: github/codeql-action/init@v3
-  #       with:
-  #         languages: ${{ matrix.language }}
-# 
-  #     - name: Perform CodeQL Analysis
-  #       uses: github/codeql-action/analyze@v3
-  #       with:
-  #         category: "/language:${{matrix.language}}"
 
-  # DH - comment out only to speed up testing of the consistency checker
-  # run-lint:
-  #   name: Linting Code
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-# 
-  #     - name: Lint Code Base
-  #       uses: github/super-linter@v4
-  #       env:
-  #         VALIDATE_ALL_CODEBASE: false
-  #         DEFAULT_BRANCH: "main"
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         VALIDATE_YAML: false
-  #         VALIDATE_GITHUB_ACTIONS: false
-  #         VALIDATE_PYTHON_BLACK: false
-  #         VALIDATE_PYTHON_FLAKE8: false
-  #         VALIDATE_PYTHON_ISORT: false
-  #         VALIDATE_JAVASCRIPT_STANDARD: false
-  #         VALIDATE_MARKDOWN: false
-  #         VALIDATE_NATURAL_LANGUAGE: false
-  #         VALIDATE_MARKDOWN_PRETTIER: false
+  analyze:
+    name: Security Analysis on (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+
+
+  run-lint:
+    name: Linting Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: "main"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_YAML: false
+          VALIDATE_GITHUB_ACTIONS: false
+          VALIDATE_PYTHON_BLACK: false
+          VALIDATE_PYTHON_FLAKE8: false
+          VALIDATE_PYTHON_ISORT: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_MARKDOWN: false
+          VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_MARKDOWN_PRETTIER: false
 
   test:
     name: Run Engine Tests
