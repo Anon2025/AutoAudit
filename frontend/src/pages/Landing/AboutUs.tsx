@@ -8,7 +8,6 @@ import {
   Shield,
   Rocket,
 } from "lucide-react";
-import "./LandingPage.css";
 import LandingHeader from "./components/LandingHeader";
 import LandingFooter from "./components/LandingFooter";
 
