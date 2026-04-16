@@ -88,6 +88,25 @@ export type SignupFormPanelProps = {
   submitError: string;
 };
 
+type PasswordStrength = {
+  label: string;
+  level: 1 | 2 | 3 | 4;
+};
+
+export const getPasswordStrength = (password: string): PasswordStrength | null => {
+  if (!password) return null;
+  if (password.length < 6) return { label: "Weak", level: 1 };
+  let score = 0;
+  if (password.length >= 10) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  if (score <= 1) return { label: "Weak", level: 1 };
+  if (score === 2) return { label: "Fair", level: 2 };
+  if (score === 3) return { label: "Good", level: 3 };
+  return { label: "Strong", level: 4 };
+};
+
 const SignupFormPanel = ({
   formData,
   onFormChange,
@@ -147,6 +166,22 @@ const SignupFormPanel = ({
     }
 
     setError("Unsupported provider.");
+  };
+
+  const strength = getPasswordStrength(formData.password);
+
+  const strengthBarColor: Record<number, string> = {
+    1: "bg-red-500",
+    2: "bg-orange-400",
+    3: "bg-yellow-400",
+    4: "bg-green-500",
+  };
+
+  const strengthLabelColor: Record<number, string> = {
+    1: "text-red-500",
+    2: "text-orange-400",
+    3: "text-yellow-400",
+    4: "text-green-500",
   };
 
   return (
@@ -238,6 +273,21 @@ const SignupFormPanel = ({
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+            {strength && (
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="flex flex-1 gap-1">
+                  {([1, 2, 3, 4] as const).map((i) => (
+                    <div
+                      key={i}
+                      className={`h-1 flex-1 rounded ${i <= strength.level ? strengthBarColor[strength.level] : "bg-white/10"}`}
+                    />
+                  ))}
+                </div>
+                <span className={`w-10 text-right text-xs ${strengthLabelColor[strength.level]}`}>
+                  {strength.label}
+                </span>
+              </div>
+            )}
           </label>
 
           <label className="flex flex-col">
