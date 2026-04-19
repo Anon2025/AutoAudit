@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './Dropdown.css';
 
 // Define type for each option
 type Option = {
@@ -63,49 +62,53 @@ const Dropdown: React.FC<DropdownProps> = ({
   const selectedLabel = selectedOption?.label ?? 'No options';
 
   return (
-    <div
-      className={`chart-dropdown ${isDarkMode ? 'dark' : 'light'}`}
-      ref={dropdownRef}
+  <div
+    ref={dropdownRef}
+    className="relative inline-block min-w-0 flex-shrink isolate"
+  >
+    <button
+      type="button"
+      onClick={() => {
+        if (!hasOptions) return;
+        setIsOpen(!isOpen);
+      }}
+      className="flex items-center justify-between gap-2 min-w-[40px] max-w-full px-[12px] py-[8px] text-[14px] font-bold rounded-[8px] border transition-all duration-200 bg-transparent text-[#b0c4de] border-[rgba(59,130,246,0.12)] hover:bg-[rgba(255,255,255,0.04)] hover:border-[rgba(59,130,246,0.35)] hover:text-white focus:outline-none focus:border-[rgba(59,130,246,0.6)] focus:shadow-[0_0_0_2px_rgba(59,130,246,0.25)]"
     >
-      <button
-        type="button"
-        onClick={() => {
-          if (!hasOptions) return;
-          setIsOpen(!isOpen);
-        }}
-        className="chart-dropdown-trigger"
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        disabled={!hasOptions}
-      >
-        <span className="chart-dropdown-text">{selectedLabel}</span>
-        <span
-          className={`chart-dropdown-arrow ${isOpen ? 'open' : ''}`}
-        >
-          ▼
-        </span>
-      </button>
+      <span className="flex-1 text-left truncate min-w-0">
+        {selectedLabel}
+      </span>
 
-      {isOpen && hasOptions && (
-        <div className="chart-dropdown-menu" role="listbox">
-          {safeOptions.map((option) => (
-            <button
-              key={option.value}
-              className={`chart-dropdown-option ${
-                option.value === value ? 'selected' : ''
-              }`}
-              onClick={() => handleSelect(option)}
-              type="button"
-              role="option"
-              aria-selected={option.value === value}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+      <span
+        className={`text-[12px] flex-shrink-0 transition-transform duration-200 ${
+          isOpen ? "rotate-180" : ""
+        } text-[#94a3b8]`}
+      >
+        ▼
+      </span>
+    </button>
+
+    {isOpen && hasOptions && (
+      <div
+        className="absolute top-full left-0 right-0 mt-[4px] rounded-[8px] border overflow-hidden z-[1100] transition-all duration-300 bg-[rgb(30_41_59)] border-[rgba(59,130,246,0.06)] shadow-[0_18px_45px_rgba(0,0,0,0.6)]"
+      >
+        {safeOptions.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => handleSelect(option)}
+            type="button"
+            className={`w-full text-left px-[16px] py-[12px] text-[14px] transition-all duration-200 border-b last:border-b-0 text-[#b0c4de] border-[rgba(59,130,246,0.12)] hover:bg-[rgba(255,255,255,0.04)] hover:text-white ${
+              option.value === value
+                ? "bg-[rgba(59,130,246,0.12)] font-medium hover:bg-[rgba(59,130,246,0.18)]"
+                : ""
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
+);
 };
 
 export default Dropdown;
