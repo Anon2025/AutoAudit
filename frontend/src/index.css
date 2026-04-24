@@ -5,6 +5,8 @@
    ============================================================================ */
 
 :root {
+  --secondary: 30 41 59;
+
   /* Surfaces */
   --surface-1: 15 23 42;
   --surface-2: 30 41 59;
@@ -43,10 +45,11 @@
   --border-subtle: 226 232 240;
   --text-strong: 11 18 32;
   --text-muted: 71 85 105;
+  --secondary: 255 255 255;
 }
 
 @theme inline {
-  --color-secondary: #1e293b;
+  --color-secondary: rgb(var(--secondary));
   --color-surface-1: rgb(var(--surface-1));
   --color-surface-2: rgb(var(--surface-2));
   --color-border-subtle: rgb(var(--border-subtle));
@@ -107,7 +110,7 @@
     outline-offset: 2px;
   }
 
-  button {
+  a, button {
     @apply cursor-pointer;
   }
 

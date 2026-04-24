@@ -65,7 +65,7 @@ const NavButton: React.FC<NavButtonProps> = ({
     : "";
 
   const activeButton = isActive
-    ? "bg-blue-500 text-white shadow-[0_4px_20px_rgba(59,130,246,0.4)] hover:bg-blue-600"
+    ? "bg-blue-500 shadow-[0_4px_20px_rgba(59,130,246,0.4)] hover:bg-blue-600"
     : "";
 
   return (

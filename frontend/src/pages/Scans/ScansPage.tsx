@@ -319,7 +319,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 						</div>
 					</div>
 					<button
-						className="toolbar-button primary"
+						className="inline-flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
 						onClick={() => setShowForm(!showForm)}
 						disabled={connections.length === 0}
 					>
@@ -451,7 +451,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 				)}
 
 				{/* Scans List */}
-				<div className="bg-secondary border border-(--border-color) rounded-xl overflow-hidden">
+				<div className="bg-secondary border border-dashed border-slate-600 rounded-xl overflow-hidden">
 					{scans.length === 0 ? (
 						<div className="text-center py-16 px-5">
 							<Search

@@ -98,8 +98,10 @@ export default function AccountPage({
         </div>
 
         {/* PROFILE CARD (FIXES YOUR PR COMMENTS) */}
-        <div className="p-6 rounded-xl border border-slate-700 bg-slate-800 shadow-md">
-          <h3 className="text-lg font-semibold mb-4">Profile</h3>
+        <div className="p-6 rounded-xl border border-slate-700 bg-secondary shadow-md">
+          <h3 className="text-lg font-semibold">Profile</h3>
+
+          <hr className="border border-slate-600 my-4"/>
 
           <div className="space-y-3">
             <div className="flex flex-col">
