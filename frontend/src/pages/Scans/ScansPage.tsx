@@ -349,7 +349,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 
 				{/* New Scan Form */}
 				{showForm && (
-					<div className="bg-(--bg-secondary) border border-(--border-color) rounded-xl p-6 mb-6">
+					<div className="bg-secondary border border-(--border-color) rounded-xl p-6 mb-6">
 						<h3 className="text-(--text-primary) text-lg font-semibold mb-5">
 							New Compliance Scan
 						</h3>
@@ -451,7 +451,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 				)}
 
 				{/* Scans List */}
-				<div className="bg-(--bg-secondary) border border-(--border-color) rounded-xl overflow-hidden">
+				<div className="bg-secondary border border-(--border-color) rounded-xl overflow-hidden">
 					{scans.length === 0 ? (
 						<div className="text-center py-16 px-5">
 							<Search

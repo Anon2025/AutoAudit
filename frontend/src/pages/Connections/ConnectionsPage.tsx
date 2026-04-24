@@ -100,7 +100,7 @@ const ConnectionsPage: React.FC<ConnectionsPageProps> = ({
   );
   const pageTheme = isDarkMode
     ? {
-        page: "bg-slate-950 text-white",
+        page: "bg-primary text-white",
         card: "bg-slate-900 border-slate-800",
         muted: "text-slate-400",
         strong: "text-slate-100",

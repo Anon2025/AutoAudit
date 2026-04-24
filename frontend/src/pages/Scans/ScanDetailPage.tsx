@@ -263,7 +263,7 @@ const ScanDetailPage: React.FC<ScanDetailPageProps> = ({
 	}`;
 
 	const cardBg = isDarkMode
-		? "bg-[var(--bg-secondary)] border-[var(--border-color)]"
+		? "bg-secondary border-[var(--border-color)]"
 		: "bg-white border-slate-200";
 
 	const tertiaryBg = isDarkMode ? "bg-[var(--bg-tertiary)]" : "bg-slate-200";
@@ -631,7 +631,7 @@ const ScanDetailPage: React.FC<ScanDetailPageProps> = ({
 												<span
 													className={`rounded px-2 py-0.5 font-mono text-xs ${textTertiary} ${
 														isDarkMode
-															? "bg-(--bg-secondary)"
+															? "bg-secondary"
 															: "bg-white"
 													}`}
 												>
