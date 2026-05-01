@@ -28,7 +28,8 @@ CRITICAL_BASELINE_PERMISSIONS = {
 PERMISSION_PROBES: dict[str, str] = {
     "Organization.Read.All": "/v1.0/organization?$top=1&$select=id",
     "User.Read.All": "/v1.0/users?$top=1&$select=id",
-    "RoleManagement.Read.Directory": "/v1.0/directoryRoles?$top=1",
+    # directoryRoles does not support $top; use a minimal supported projection instead.
+    "RoleManagement.Read.Directory": "/v1.0/directoryRoles?$select=id",
     "Group.Read.All": "/v1.0/groups?$top=1&$select=id",
     "Domain.Read.All": "/v1.0/domains?$top=1&$select=id",
     "Policy.Read.All": "/v1.0/policies/authorizationPolicy?$select=id",
@@ -54,6 +55,30 @@ class ReadinessResult:
     missing_permissions: list[str]
     unverified_permissions: list[str]
     checks: list[ReadinessCheck]
+
+
+def extract_graph_error_detail(response: httpx.Response) -> str | None:
+    """Extract a short Graph error message for non-auth probe failures."""
+    try:
+        payload = response.json()
+    except Exception:
+        payload = None
+
+    if isinstance(payload, dict):
+        error = payload.get("error")
+        if isinstance(error, dict):
+            message = error.get("message")
+            if isinstance(message, str) and message.strip():
+                return message.strip()
+        detail = payload.get("detail")
+        if isinstance(detail, str) and detail.strip():
+            return detail.strip()
+
+    text = (response.text or "").strip()
+    if text:
+        return text.splitlines()[0].strip()
+
+    return None
 
 
 def extract_required_permissions(controls: list[dict]) -> list[str]:
@@ -218,7 +243,14 @@ async def evaluate_scan_readiness(
                     label=f"Permission: {permission}",
                     status="warn",
                     severity="warning",
-                    message=f"Permission probe returned HTTP {response.status_code}.",
+                    message=(
+                        f"Permission probe returned HTTP {response.status_code}"
+                        + (
+                            f": {detail}"
+                            if (detail := extract_graph_error_detail(response))
+                            else "."
+                        )
+                    ),
                 )
             )
 
@@ -238,4 +270,3 @@ async def evaluate_scan_readiness(
         unverified_permissions=sorted(unverified_permissions),
         checks=checks,
     )
-
