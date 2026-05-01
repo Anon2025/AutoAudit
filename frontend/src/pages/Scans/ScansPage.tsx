@@ -371,13 +371,14 @@ const ScansPage: React.FC<ScansPageProps> = ({
 										disabled={isSubmitting}
 										className="w-full px-3.5 py-2.5 bg-(--bg-tertiary) border border-(--border-color) rounded-lg text-(--text-primary) text-sm transition-colors duration-200 cursor-pointer focus:outline-none focus:border-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
 									>
-										<option value="">
+										<option value="" className="bg-primary">
 											Select a cloud platform
 										</option>
 										{connections.map((conn) => (
 											<option
 												key={conn.id}
 												value={conn.id}
+												className="bg-primary"
 											>
 												{conn.name}
 											</option>
@@ -401,13 +402,14 @@ const ScansPage: React.FC<ScansPageProps> = ({
 										disabled={isSubmitting}
 										className="w-full px-3.5 py-2.5 bg-(--bg-tertiary) border border-(--border-color) rounded-lg text-(--text-primary) text-sm transition-colors duration-200 cursor-pointer focus:outline-none focus:border-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
 									>
-										<option value="">
+										<option value="" className="bg-primary">
 											Select a benchmark
 										</option>
 										{benchmarks.map((bench) => (
 											<option
 												key={`${bench.framework}|${bench.slug}|${bench.version}`}
 												value={`${bench.framework}|${bench.slug}|${bench.version}`}
+												className="bg-primary"
 											>
 												{bench.name} ({bench.version})
 											</option>
@@ -585,7 +587,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 											) => e.stopPropagation()}
 										>
 											<button
-												className="flex items-center gap-2 rounded-lg font-medium cursor-pointer [transition:all_0.3s_ease] border-none outline-none text-[#ef4444] px-2.5 py-1.5 text-[13px]"
+												className="flex items-center gap-2 rounded-lg font-medium cursor-pointer [transition:all_0.3s_ease] border-none outline-none text-[rgb(var(--accent-bad))] px-2.5 py-1.5 text-[13px]"
 												onClick={() =>
 													handleDelete(scan.id)
 												}

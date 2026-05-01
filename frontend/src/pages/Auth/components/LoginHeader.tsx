@@ -11,7 +11,7 @@ const navLinks: { label: string; href: string }[] = [
 
 const LoginHeader = () => {
   return (
-    <header className="flex items-center justify-between border-b border-white/10 bg-[rgba(10,22,40,0.95)] px-[5%] py-6 backdrop-blur-[10px]">
+    <header className="flex items-center justify-between border-b border-white/10 bg-[rgb(var(--landing-bg-base)/0.95)] px-[5%] py-6 backdrop-blur-[10px]">
       <Link to="/" aria-label="AutoAudit home" className="block">
         <img
           src="/AutoAudit.png"
@@ -26,7 +26,7 @@ const LoginHeader = () => {
             <Link
               key={link.label}
               to={link.href}
-              className="relative font-medium text-[#e0e0e0] transition-colors duration-300 hover:text-blue-500"
+              className="relative font-medium text-[rgb(224_224_224)] transition-colors duration-300 hover:text-blue-500"
             >
               {link.label}
             </Link>
@@ -34,7 +34,7 @@ const LoginHeader = () => {
             <a
               key={link.label}
               href={link.href}
-              className="relative font-medium text-[#e0e0e0] transition-colors duration-300 hover:text-blue-500"
+              className="relative font-medium text-[rgb(224_224_224)] transition-colors duration-300 hover:text-blue-500"
             >
               {link.label}
             </a>

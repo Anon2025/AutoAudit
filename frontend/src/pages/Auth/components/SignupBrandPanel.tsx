@@ -47,18 +47,18 @@ const SignupBrandPanel = () => {
       `}</style>
 
       <span
-        className="pointer-events-none absolute -right-40 -top-40 h-120 w-120 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.15)_0%,transparent_70%)] opacity-60 animate-[brandPulse_8s_ease-in-out_infinite]"
+        className="pointer-events-none absolute -right-40 -top-40 h-120 w-120 rounded-full bg-[radial-gradient(circle,rgb(var(--brand-blue)/0.15)_0%,transparent_70%)] opacity-60 animate-[brandPulse_8s_ease-in-out_infinite]"
         aria-hidden="true"
       />
       <span
-        className="pointer-events-none absolute -bottom-30 -left-30 h-90 w-90 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.15)_0%,transparent_70%)] opacity-60 [animation-delay:2s] animate-[brandPulse_8s_ease-in-out_infinite]"
+        className="pointer-events-none absolute -bottom-30 -left-30 h-90 w-90 rounded-full bg-[radial-gradient(circle,rgb(var(--brand-blue)/0.15)_0%,transparent_70%)] opacity-60 [animation-delay:2s] animate-[brandPulse_8s_ease-in-out_infinite]"
         aria-hidden="true"
       />
 
       {particles.map((particle, index) => (
         <span
           key={index}
-          className={`absolute h-1 w-1 rounded-full bg-[#3b82f6] opacity-40 ${particle.position} ${particle.delay}`}
+          className={`absolute h-1 w-1 rounded-full bg-[rgb(var(--brand-blue))] opacity-40 ${particle.position} ${particle.delay}`}
           aria-hidden="true"
         />
       ))}
@@ -69,7 +69,7 @@ const SignupBrandPanel = () => {
           <img
             src="/AutoAudit.png"
             alt="AutoAudit"
-            className="mb-4 h-auto w-45 drop-shadow-[0_10px_25px_rgba(59,130,246,0.3)]"
+            className="mb-4 h-auto w-45 drop-shadow-[0_10px_25px_rgb(var(--brand-blue)/0.3)]"
             loading="lazy"
           />
         </picture>
@@ -78,7 +78,7 @@ const SignupBrandPanel = () => {
           <h1 className="mb-4 bg-[linear-gradient(135deg,#ffffff,#3b82f6)] bg-clip-text text-[clamp(1.8rem,4vw,2.3rem)] font-bold text-transparent">
             Start Your Compliance Journey
           </h1>
-          <p className="m-0 text-center leading-[1.6] text-[#b0c4de]">
+          <p className="m-0 text-center leading-[1.6] text-[rgb(var(--landing-text-soft))]">
             Join organizations that rely on AutoAudit to monitor, analyze, and improve their
             Microsoft 365 security posture.
           </p>
@@ -90,7 +90,7 @@ const SignupBrandPanel = () => {
             return (
               <article
                 key={item.text}
-                className="flex items-center gap-4 rounded-xl border border-[rgba(59,130,246,0.1)] bg-[rgba(255,255,255,0.03)] p-4 text-left"
+                className="flex items-center gap-4 rounded-xl border border-[rgb(var(--brand-blue)/0.1)] bg-[rgb(255_255_255/0.03)] p-4 text-left"
               >
                 <span
                   className="grid h-10 w-10 place-items-center rounded-[10px] bg-[linear-gradient(135deg,#3b82f6,#2563eb)]"

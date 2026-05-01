@@ -11,7 +11,7 @@ export type LoginPageProps = {
 
 const LoginPage = ({ onLogin, onSignUpClick }: LoginPageProps) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#081b2e]">
+    <div className="min-h-screen flex flex-col bg-[rgb(8_27_46)]">
       <LandingHeader />
 
       <main className="flex flex-1 items-center justify-center px-6 py-12">

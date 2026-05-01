@@ -352,7 +352,7 @@ const Evidence = ({ sidebarWidth = 220, isDarkMode = true }: EvidencePageProps) 
           are supported.
         </p>
 
-        <div className="border border-border-subtle rounded-2xl p-6 bg-surface-2 shadow-[0_4px_12px_rgba(0,0,0,0.1)] mb-6 transition-all duration-300">
+        <div className="border border-border-subtle rounded-2xl p-6 bg-surface-2 shadow-[0_4px_12px_rgb(0_0_0/0.1)] mb-6 transition-all duration-300">
           <div className="grid grid-cols-1 gap-5 mb-5">
             <div className="flex flex-col">
               <label htmlFor="strategy" className="block mb-2 font-semibold text-text-strong text-sm">
@@ -435,7 +435,7 @@ const Evidence = ({ sidebarWidth = 220, isDarkMode = true }: EvidencePageProps) 
         </div>
 
         {results && (
-          <div className="border border-border-subtle rounded-2xl p-6 bg-surface-2 shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-300 w-full overflow-hidden">
+          <div className="border border-border-subtle rounded-2xl p-6 bg-surface-2 shadow-[0_4px_12px_rgb(0_0_0/0.1)] transition-all duration-300 w-full overflow-hidden">
             <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
               <h3 className="m-0 text-text-strong text-xl font-semibold">Results</h3>
               <div className="flex items-center gap-2 flex-wrap">

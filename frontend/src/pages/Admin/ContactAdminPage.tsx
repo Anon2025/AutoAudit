@@ -245,7 +245,7 @@ const ContactAdminPage: React.FC = () => {
   const isLongMessage = messageWordCount > 500;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#0a1628] font-sans text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[rgb(var(--landing-bg-base))] font-sans text-white">
       <div className="mx-auto max-w-400 px-[3%] py-8">
         <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>

@@ -52,8 +52,8 @@ const footerColumns: FooterColumn[] = [
 
 const LandingFooter = () => {
   return (
-    <footer className="relative overflow-hidden border-t border-[rgba(59,130,246,0.1)] bg-linear-to-br from-[#0a1628] via-[#0f1f38] to-[#162a4a] px-[5%] pb-10 pt-16">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(59,130,246,0.08),transparent_62%),radial-gradient(circle_at_88%_22%,rgba(37,99,235,0.06),transparent_60%)]" />
+    <footer className="relative overflow-hidden border-t border-[rgb(var(--brand-blue)/0.1)] bg-linear-to-br from-landing-bg-base via-landing-bg-mid to-landing-bg-end px-[5%] pb-10 pt-16">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgb(var(--brand-blue)/0.08),transparent_62%),radial-gradient(circle_at_88%_22%,rgb(var(--brand-blue-deep)/0.06),transparent_60%)]" />
       <div className="relative mx-auto mb-8 grid max-w-300 grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8">
         {footerColumns.map((column) => (
           <section key={column.title}>
@@ -63,21 +63,21 @@ const LandingFooter = () => {
                 <li key={link.label} className="mt-3 first:mt-0">
                   {link.href === "#" ? (
                     <span
-                      className="cursor-not-allowed text-[rgba(176,196,222,0.45)]"
+                      className="cursor-not-allowed text-[rgb(var(--landing-text-soft)/0.45)]"
                       aria-disabled="true"
                     >
                       {link.label}
                     </span>
                   ) : link.href.startsWith("/") ? (
-                    <Link className="text-[#b0c4de] transition-colors duration-200 hover:text-[#3b82f6]" to={link.href}>
+                    <Link className="text-landing-text-soft transition-colors duration-200 hover:text-brand-blue" to={link.href}>
                       {link.label}
                     </Link>
                   ) : link.href.startsWith("#") ? (
-                    <Link className="text-[#b0c4de] transition-colors duration-200 hover:text-[#3b82f6]" to={`/${link.href}`}>
+                    <Link className="text-landing-text-soft transition-colors duration-200 hover:text-brand-blue" to={`/${link.href}`}>
                       {link.label}
                     </Link>
                   ) : (
-                    <a className="text-[#b0c4de] transition-colors duration-200 hover:text-[#3b82f6]" href={link.href}>
+                    <a className="text-landing-text-soft transition-colors duration-200 hover:text-brand-blue" href={link.href}>
                       {link.label}
                     </a>
                   )}
@@ -87,7 +87,7 @@ const LandingFooter = () => {
           </section>
         ))}
       </div>
-      <div className="relative border-t border-[rgba(59,130,246,0.1)] pt-6 text-center text-sm text-[#b0c4de]">
+      <div className="relative border-t border-[rgb(var(--brand-blue)/0.1)] pt-6 text-center text-sm text-landing-text-soft">
         <p>&copy; {new Date().getFullYear()} AutoAudit. All rights reserved.</p>
       </div>
     </footer>
