@@ -1,34 +1,27 @@
-"""Pre-scan readiness checks for M365 compliance scans.
-
-This module validates whether a selected M365 connection and benchmark are
-ready enough to start a scan with actionable results.
-"""
+# Pre-scan checks for M365 scans.
+# Purpose: this file checks whether the selected M365 connection and benchmarkare ready enough to start a scan.
 
 from __future__ import annotations
-
 from dataclasses import dataclass
-
 import httpx
-
 from app.services.m365_graph import (
     M365ConnectionError,
     acquire_graph_access_token,
     validate_m365_connection,
 )
 
-
+# These permissions are critical for all current benchmarks CIS, so we check them all the time and mark them as "critical".
 CRITICAL_BASELINE_PERMISSIONS = {
     "Organization.Read.All",
     "User.Read.All",
     "RoleManagement.Read.Directory",
 }
 
-# Probe endpoints used to test whether the token can access data that requires
-# each permission. If a permission isn't mapped, we report it as unverified.
+# Simple Graph endpoints used to test each permission.
+# If we do not have a probe for a permission, we return it as "unverified".
 PERMISSION_PROBES: dict[str, str] = {
     "Organization.Read.All": "/v1.0/organization?$top=1&$select=id",
     "User.Read.All": "/v1.0/users?$top=1&$select=id",
-    # directoryRoles does not support $top; use a minimal supported projection instead.
     "RoleManagement.Read.Directory": "/v1.0/directoryRoles?$select=id",
     "Group.Read.All": "/v1.0/groups?$top=1&$select=id",
     "Domain.Read.All": "/v1.0/domains?$top=1&$select=id",
@@ -37,7 +30,6 @@ PERMISSION_PROBES: dict[str, str] = {
     "OrgSettings-AppsAndServices.Read.All": "/beta/admin/appsAndServices",
 }
 
-
 @dataclass
 class ReadinessCheck:
     key: str
@@ -45,7 +37,6 @@ class ReadinessCheck:
     status: str
     severity: str
     message: str
-
 
 @dataclass
 class ReadinessResult:
@@ -56,9 +47,8 @@ class ReadinessResult:
     unverified_permissions: list[str]
     checks: list[ReadinessCheck]
 
-
+# Return a short Graph error message when a probe fails.
 def extract_graph_error_detail(response: httpx.Response) -> str | None:
-    """Extract a short Graph error message for non-auth probe failures."""
     try:
         payload = response.json()
     except Exception:
@@ -80,9 +70,10 @@ def extract_graph_error_detail(response: httpx.Response) -> str | None:
 
     return None
 
-
+# Return the permissions declared for controls marked as ready.
+# The scan engine only runs controls whose 'automation_status' is 'ready'.
+# Readiness follows the same rule and collects permissions from those controls only.
 def extract_required_permissions(controls: list[dict]) -> list[str]:
-    """Extract unique required permissions for automated/ready controls."""
     permissions: set[str] = set()
 
     for control in controls:
@@ -95,7 +86,13 @@ def extract_required_permissions(controls: list[dict]) -> list[str]:
 
     return sorted(permissions)
 
-
+# Check whether a tenant looks ready before starting a scan.
+# This method:
+# 1. checks that the saved M365 credentials can log in
+# 2. gets a Microsoft Graph token
+# 3. checks the permissions declared by benchmark metadata
+# 4. returns simple pass / warn / fail results for the UI
+# It does not start the scan. It is only a pre-check.
 async def evaluate_scan_readiness(
     *,
     tenant_id: str,
@@ -103,7 +100,6 @@ async def evaluate_scan_readiness(
     client_secret: str,
     required_permissions: list[str],
 ) -> ReadinessResult:
-    """Run connection + permission checks for a scan request."""
     checks: list[ReadinessCheck] = []
     missing_permissions: set[str] = set()
     unverified_permissions: set[str] = set()
@@ -167,6 +163,8 @@ async def evaluate_scan_readiness(
             checks=checks,
         )
 
+    # Always check a small baseline set because these are commonly needed,
+    # even when the benchmark declares only a few permissions.
     permissions_to_probe = sorted(
         set(required_permissions).union(CRITICAL_BASELINE_PERMISSIONS)
     )
@@ -262,6 +260,7 @@ async def evaluate_scan_readiness(
     if ready and (missing_permissions or unverified_permissions):
         summary = "Ready with warnings: some controls may be skipped or fail."
 
+    # Return the full details for the UI to display.
     return ReadinessResult(
         ready=ready,
         summary=summary,

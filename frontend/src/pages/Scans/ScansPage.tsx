@@ -179,6 +179,25 @@ const ScansPage: React.FC<ScansPageProps> = ({ sidebarWidth = 220, isDarkMode = 
     return { framework, benchmark, version };
   }
 
+  // Get a warning message if the pre-scan readiness checks did not pass.
+  function getReadinessWarningMessage(): string | null {
+    if (!readiness) {
+      return 'Pre-scan readiness has not been run. Starting anyway may lead to a stuck, pending, or partially failed scan if the tenant is missing required permissions. Do you want to continue?';
+    }
+
+    const hasFailures = readiness.checks.some(check => check.status === 'fail');
+    if (hasFailures) {
+      return 'Pre-scan readiness found blocking issues. Starting anyway may lead to a stuck, pending, or failed scan because some required access checks did not pass. Do you want to continue?';
+    }
+
+    const hasWarnings = readiness.checks.some(check => check.status === 'warn');
+    if (hasWarnings) {
+      return 'Pre-scan readiness returned warnings. Some controls may be skipped or fail during the scan. Do you want to continue?';
+    }
+
+    return null;
+  }
+
   async function handleRunReadinessCheck(): Promise<void> {
     setError(null);
     setReadiness(null);
@@ -217,8 +236,8 @@ const ScansPage: React.FC<ScansPageProps> = ({ sidebarWidth = 220, isDarkMode = 
     e.preventDefault();
     setError(null);
 
-    if (!readiness?.ready) {
-      setError('Run pre-scan readiness check and resolve blockers before starting a scan.');
+    const readinessWarning = getReadinessWarningMessage();
+    if (readinessWarning && !window.confirm(readinessWarning)) {
       return;
     }
 
@@ -472,7 +491,7 @@ const ScansPage: React.FC<ScansPageProps> = ({ sidebarWidth = 220, isDarkMode = 
                 <button
                   type="submit"
                   className="toolbar-button primary"
-                  disabled={isSubmitting || !readiness?.ready}
+                  disabled={isSubmitting}
                 >
                   {isSubmitting ? (
                     <>
