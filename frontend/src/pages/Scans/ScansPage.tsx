@@ -433,6 +433,15 @@ const ScansPage: React.FC<ScansPageProps> = ({
 		transition: "margin-left 0.4s ease, width 0.4s ease",
 	};
 
+	const tableHeaderCellClass =
+		"py-4 px-5 text-xs font-semibold tracking-wider text-left uppercase border-b text-(--text-secondary) border-(--border-color)] bg-(--bg-tertiary)";
+
+	const tableBodyCellClass =
+		"py-4 px-5 text-sm border-b text-(--text-primary) border-(--border-color)]";
+
+	const tableActionCellClass =
+		"text-right px-5 py-4 text-sm border-b border-(--border-color)] w-[1%] whitespace-nowrap";
+
 	if (isLoading) {
 		return (
 			<div
@@ -739,22 +748,24 @@ const ScansPage: React.FC<ScansPageProps> = ({
 							<table className="w-full min-w-[760px] border-collapse">
 								<thead>
 									<tr>
-										<th className="py-4 px-5 text-xs font-semibold tracking-wider text-left uppercase border-b text-(--text-secondary) border-(--border-color)] bg-(--bg-tertiary)">
+										<th className={tableHeaderCellClass}>
 											Status
 										</th>
-										<th className="py-4 px-5 text-xs font-semibold tracking-wider text-left uppercase border-b text-(--text-secondary) border-(--border-color)] bg-(--bg-tertiary)">
+										<th className={tableHeaderCellClass}>
 											Benchmark
 										</th>
-										<th className="py-4 px-5 text-xs font-semibold tracking-wider text-left uppercase border-b text-(--text-secondary) border-(--border-color)] bg-(--bg-tertiary)">
+										<th className={tableHeaderCellClass}>
 											Connection
 										</th>
-										<th className="py-4 px-5 text-xs font-semibold tracking-wider text-left uppercase border-b text-(--text-secondary) border-(--border-color)] bg-(--bg-tertiary)">
+										<th className={tableHeaderCellClass}>
 											Started
 										</th>
-										<th className="py-4 px-5 text-xs font-semibold tracking-wider text-left uppercase border-b text-(--text-secondary) border-(--border-color)] bg-(--bg-tertiary)">
+										<th className={tableHeaderCellClass}>
 											Results
 										</th>
-										<th className="text-right px-5 py-4 text-(--text-secondary) text-xs font-semibold uppercase tracking-wider border-b border-(--border-color)] bg-(--bg-tertiary) w-[1%] whitespace-nowrap">
+										<th
+											className={`${tableHeaderCellClass} w-[1%] whitespace-nowrap text-right`}
+										>
 											Actions
 										</th>
 									</tr>
@@ -769,7 +780,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 											}
 											className="cursor-pointer transition-colors duration-200 hover:bg-(--bg-tertiary) last:[&>td]:border-b-0"
 										>
-											<td className="py-4 px-5 text-sm border-b text-(--text-primary) border-(--border-color)]">
+											<td className={tableBodyCellClass}>
 												<span
 													className={getStatusBadgeClasses(
 														scan.status,
@@ -784,7 +795,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 												</span>
 											</td>
 
-											<td className="py-4 px-5 text-sm border-b text-(--text-primary) border-(--border-color)]">
+											<td className={tableBodyCellClass}>
 												<span className="block font-medium">
 													{scan.benchmark || "-"}
 												</span>
@@ -793,14 +804,14 @@ const ScansPage: React.FC<ScansPageProps> = ({
 												</span>
 											</td>
 
-											<td className="py-4 px-5 text-sm border-b text-(--text-primary) border-(--border-color)]">
+											<td className={tableBodyCellClass}>
 												{scan.connection_name ||
 													(scan.m365_connection_id
 														? `Connection #${scan.m365_connection_id}`
 														: "-")}
 											</td>
 
-											<td className="py-4 px-5 text-sm border-b text-(--text-primary) border-(--border-color)]">
+											<td className={tableBodyCellClass}>
 												{(() => {
 													const dateString =
 														getStableStartedAt(
@@ -818,7 +829,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 												})()}
 											</td>
 
-											<td className="py-4 px-5 text-sm border-b text-(--text-primary) border-(--border-color)]">
+											<td className={tableBodyCellClass}>
 												{scan.status ===
 													"completed" ||
 												scan.status === "running" ? (
@@ -860,7 +871,7 @@ const ScansPage: React.FC<ScansPageProps> = ({
 											</td>
 
 											<td
-												className="text-right px-5 py-4 text-sm border-b border-(--border-color)] w-[1%] whitespace-nowrap"
+												className={tableActionCellClass}
 												onClick={(
 													e: React.MouseEvent<HTMLTableCellElement>,
 												) => e.stopPropagation()}
