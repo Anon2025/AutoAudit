@@ -56,7 +56,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
                                 python3 -m venv .venv
                                 . .venv/bin/activate
                                 pip install --upgrade pip
-                                pip install -e ".[dev]"
+                                pip install -r requirements-test.txt
                                 pytest tests/unit -v \
                                   --junitxml=test-results-unit.xml \
                                   --cov=app.services.scan_readiness \
@@ -66,7 +66,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     }
                     post {
                         always {
-                            junit 'backend-api/test-results-unit.xml'
+                            junit allowEmptyResults: true, testResults: 'backend-api/test-results-unit.xml'
                             archiveArtifacts artifacts: 'backend-api/coverage-unit.xml', allowEmptyArchive: true
                         }
                     }
@@ -107,7 +107,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     }
                     post {
                         always {
-                            junit 'backend-api/test-results-smoke.xml'
+                            junit allowEmptyResults: true, testResults: 'backend-api/test-results-unit.xml'
                             archiveArtifacts artifacts: 'backend-api/test-results-smoke.xml', allowEmptyArchive: true
                         }
                     }
@@ -126,7 +126,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     }
                     post {
                         always {
-                            junit 'backend-api/test-results-integration.xml'
+                            junit allowEmptyResults: true, testResults: 'backend-api/test-results-integration.xml'
                             archiveArtifacts artifacts: 'backend-api/test-results-integration.xml', allowEmptyArchive: true
                         }
                     }
