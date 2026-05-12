@@ -135,6 +135,24 @@ GIT_COMMIT=${env.GIT_COMMIT}
                 }
             }
         }
+               
+        
+        stage('Code Quality Stage: SonarCloud Analysis') {
+	    steps {
+		withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+		    sh '''
+		        if [ ! -d sonar-scanner-5.0.2.4997-linux ]; then
+		            wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.2.4997-linux.zip
+		            unzip -q -o sonar-scanner-cli-5.0.2.4997-linux.zip
+		        fi
+
+		        ./sonar-scanner-5.0.2.4997-linux/bin/sonar-scanner \
+		          -Dsonar.token=$SONAR_TOKEN
+		    '''
+		}
+	    }
+	}
+
     }
 }
 
