@@ -147,7 +147,8 @@ GIT_COMMIT=${env.GIT_COMMIT}
 		        fi
 
 		        ./sonar-scanner-5.0.2.4997-linux/bin/sonar-scanner \
-		          -Dsonar.token=$SONAR_TOKEN
+		          -Dsonar.token=$SONAR_TOKEN \
+		          -Dsonar.qualitygate.wait=true
 		    '''
 		}
 	    }
