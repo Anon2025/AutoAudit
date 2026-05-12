@@ -72,46 +72,43 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     }
                 }
 
-                stage('Start Test Environment') {
-                    steps {
-                        sh 'docker-compose --profile frontend-dev down -v || true'
-                        sh 'docker-compose --profile frontend-dev up -d db redis opa backend-api'
+             
+     		stage('Smoke Tests') {
+		    steps {
+			sh 'docker-compose --profile frontend-dev down -v || true'
+			sh 'docker-compose --profile frontend-dev up -d db redis opa backend-api'
 
-                        sh '''
-                            echo "Waiting for backend API..."
-                            for i in $(seq 1 30); do
-                                if curl -fsS http://localhost:8000/ > /dev/null; then
-                                    echo "Backend API is ready"
-                                    exit 0
-                                fi
-                                sleep 2
-                            done
+			sh '''
+			    echo "Waiting for backend API..."
+			    for i in $(seq 1 30); do
+				if curl -fsS http://localhost:8000/ > /dev/null; then
+				    echo "Backend API is ready"
+				    exit 0
+				fi
+				sleep 2
+			    done
 
-                            echo "Backend API did not become ready in time"
-                            docker logs autoaudit-backend-api --tail=100 || true
-                            exit 1
-                        '''
-                    }
-                }
+			    echo "Backend API did not become ready in time"
+			    docker logs autoaudit-backend-api --tail=100 || true
+			    exit 1
+			'''
 
-                stage('Smoke Tests') {
-                    steps {
-                        dir('backend-api') {
-                            sh '''
-                                . .venv/bin/activate
-                                API_BASE_URL=http://localhost:8000 \
-                                pytest tests/smoke -v \
-                                  --junitxml=test-results-smoke.xml
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            junit allowEmptyResults: true, testResults: 'backend-api/test-results-unit.xml'
-                            archiveArtifacts artifacts: 'backend-api/test-results-smoke.xml', allowEmptyArchive: true
-                        }
-                    }
-                }
+			dir('backend-api') {
+			    sh '''
+				. .venv/bin/activate
+				API_BASE_URL=http://localhost:8000 \
+				pytest tests/smoke -v \
+				  --junitxml=test-results-smoke.xml
+			    '''
+			}
+		    }
+		    post {
+			always {
+			    junit allowEmptyResults: true, testResults: 'backend-api/test-results-smoke.xml'
+			    archiveArtifacts artifacts: 'backend-api/test-results-smoke.xml', allowEmptyArchive: true
+			}
+		    }
+		}
 
                 stage('Integration Tests') {
                     steps {
