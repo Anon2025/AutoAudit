@@ -51,9 +51,13 @@ GIT_COMMIT=${env.GIT_COMMIT}
                 stage('Unit Tests') {
                     steps {
                         dir('backend-api') {
-                            sh 'python3 -m uv sync --frozen --extra dev'
                             sh '''
-                                python3 -m uv run pytest tests/unit -v \
+                                rm -rf .venv
+                                python3 -m venv .venv
+                                . .venv/bin/activate
+                                pip install --upgrade pip
+                                pip install -e ".[dev]"
+                                pytest tests/unit -v \
                                   --junitxml=test-results-unit.xml \
                                   --cov=app.services.scan_readiness \
                                   --cov-report=xml:coverage-unit.xml
@@ -94,8 +98,9 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     steps {
                         dir('backend-api') {
                             sh '''
+                                . .venv/bin/activate
                                 API_BASE_URL=http://localhost:8000 \
-                                python3 -m uv run pytest tests/smoke -v \
+                                pytest tests/smoke -v \
                                   --junitxml=test-results-smoke.xml
                             '''
                         }
@@ -112,8 +117,9 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     steps {
                         dir('backend-api') {
                             sh '''
+                                . .venv/bin/activate
                                 API_BASE_URL=http://localhost:8000 \
-                                python3 -m uv run pytest tests/integration -v \
+                                pytest tests/integration -v \
                                   --junitxml=test-results-integration.xml
                             '''
                         }
