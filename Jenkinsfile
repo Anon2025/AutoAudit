@@ -154,6 +154,58 @@ GIT_COMMIT=${env.GIT_COMMIT}
 	    }
 	}
 
+        stage('Security Stage') {
+            steps {
+                dir('backend-api') {
+                    sh '''
+                        . .venv/bin/activate
+                        pip install bandit pip-audit
+
+                        bandit -r app \
+                          -f json \
+                          -o bandit-report.json \
+                          --severity-level medium
+
+                        pip-audit --local \
+                          -f json \
+                          -o pip-audit-report.json
+                    '''
+                }
+
+                sh '''
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      -v "$PWD":/workspace \
+                      aquasec/trivy:latest image \
+                      --severity HIGH,CRITICAL \
+                      --format json \
+                      --output /workspace/trivy-image-report.json \
+                      ${BACKEND_IMAGE}
+
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      -v "$PWD":/workspace \
+                      aquasec/trivy:latest image \
+                      --severity HIGH,CRITICAL \
+                      --format table \
+                      --output /workspace/trivy-image-report.txt \
+                      ${BACKEND_IMAGE}
+
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      aquasec/trivy:latest image \
+                      --severity CRITICAL \
+                      --exit-code 1 \
+                      ${BACKEND_IMAGE}
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'backend-api/bandit-report.json,backend-api/pip-audit-report.json,trivy-image-report.json,trivy-image-report.txt', allowEmptyArchive: true
+                }
+            }
+        }
+
     }
 }
 
