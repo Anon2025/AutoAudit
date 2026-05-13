@@ -153,60 +153,59 @@ GIT_COMMIT=${env.GIT_COMMIT}
 		}
 	    }
 	}
+   
+       stage('Security Stage: bandit, pip-audit, trivy') {
+            steps {
+                sh '''
+                    rm -rf security-venv
+                    python3 -m venv security-venv
+                    . security-venv/bin/activate
+                    pip install --upgrade pip
+                    pip install bandit pip-audit
 
-        
-        stage('Security Stage: bandit, pip-audit, trivy') {
-	    steps {
-		sh '''
-		    rm -rf security-venv
-		    python3 -m venv security-venv
-		    . security-venv/bin/activate
-		    pip install --upgrade pip
-		    pip install bandit pip-audit
+                    bandit -r backend-api/app \
+                      -f json \
+                      -o backend-api/bandit-report.json \
+                      --severity-level medium
 
-		    bandit -r backend-api/app \
-		      -f json \
-		      -o backend-api/bandit-report.json \
-		      --severity-level medium
+                    pip-audit -r backend-api/requirements-test.txt \
+                      -f json \
+                      -o backend-api/pip-audit-report.json
+                '''
 
-		    pip-audit -r backend-api/requirements-test.txt \
-		      -f json \
-		      -o backend-api/pip-audit-report.json
-		'''
+                sh '''
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      -v "$PWD":/workspace \
+                      aquasec/trivy:latest image \
+                      --severity HIGH,CRITICAL \
+                      --format json \
+                      --output /workspace/trivy-image-report.json \
+                      ${BACKEND_IMAGE}
 
-		sh '''
-		    docker run --rm \
-		      -v /var/run/docker.sock:/var/run/docker.sock \
-		      -v "$PWD":/workspace \
-		      aquasec/trivy:latest image \
-		      --severity HIGH,CRITICAL \
-		      --format json \
-		      --output /workspace/trivy-image-report.json \
-		      ${BACKEND_IMAGE}
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      -v "$PWD":/workspace \
+                      aquasec/trivy:latest image \
+                      --severity HIGH,CRITICAL \
+                      --format table \
+                      --output /workspace/trivy-image-report.txt \
+                      ${BACKEND_IMAGE}
 
-		    docker run --rm \
-		      -v /var/run/docker.sock:/var/run/docker.sock \
-		      -v "$PWD":/workspace \
-		      aquasec/trivy:latest image \
-		      --severity HIGH,CRITICAL \
-		      --format table \
-		      --output /workspace/trivy-image-report.txt \
-		      ${BACKEND_IMAGE}
-
-		    docker run --rm \
-		      -v /var/run/docker.sock:/var/run/docker.sock \
-		      aquasec/trivy:latest image \
-		      --severity CRITICAL \
-		      --exit-code 1 \
-		      ${BACKEND_IMAGE}
-		'''
-	    }
-	    post {
-		always {
-		    archiveArtifacts artifacts: 'backend-api/bandit-report.json,backend-api/pip-audit-report.json,trivy-image-report.json,trivy-image-report.txt', allowEmptyArchive: true
-		}
-	    }
-	}
+                    docker run --rm \
+                      -v /var/run/docker.sock:/var/run/docker.sock \
+                      aquasec/trivy:latest image \
+                      --severity CRITICAL \
+                      --exit-code 1 \
+                      ${BACKEND_IMAGE}
+                '''
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'backend-api/bandit-report.json,backend-api/pip-audit-report.json,trivy-image-report.json,trivy-image-report.txt', allowEmptyArchive: true
+                }
+            }
+        }     
 
     }
 }
