@@ -200,6 +200,17 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     docker logs autoaudit-staging-backend-api --tail=100 || true
                     exit 1
                 '''
+                
+                writeFile file: 'deploy-staging-metadata.txt', text: """
+		ENVIRONMENT=staging
+		IMAGE=${env.BACKEND_IMAGE}
+		URL=http://localhost:8001/
+		COMPOSE_FILE=docker-compose.staging.yml
+		BUILD_NUMBER=${env.BUILD_NUMBER}
+		GIT_COMMIT=${env.GIT_COMMIT}
+		"""
+		
+		archiveArtifacts artifacts: 'deploy-staging-metadata.txt', fingerprint: true                                                            
             }
         }
 
@@ -226,6 +237,18 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     docker logs autoaudit-prod-backend-api --tail=100 || true
                     exit 1
                 '''
+                
+                writeFile file: 'release-production-metadata.txt', text: """
+		ENVIRONMENT=production
+		SOURCE_IMAGE=${env.BACKEND_IMAGE}
+		RELEASE_IMAGE=autoaudit-backend-api:release-${env.BUILD_NUMBER}
+		URL=http://localhost:8002/
+		COMPOSE_FILE=docker-compose.prod.yml
+		BUILD_NUMBER=${env.BUILD_NUMBER}
+		GIT_COMMIT=${env.GIT_COMMIT}
+		"""
+		
+		archiveArtifacts artifacts: 'release-production-metadata.txt', fingerprint: true
             }
         }
     }
