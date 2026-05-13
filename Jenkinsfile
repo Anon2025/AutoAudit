@@ -6,6 +6,10 @@ pipeline {
         API_BASE_URL = 'http://localhost:8000'
     }
 
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
     stages {
         stage('Checkout') {
             steps {
