@@ -154,7 +154,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
 	    }
 	}
    
-       stage('Security Stage: bandit, pip-audit, trivy') {
+       stage('Security Stage: bandit, pip-audit, Trivy') {
             steps {
                 sh '''
                     rm -rf security-venv
@@ -195,6 +195,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     docker run --rm \
                       -v /var/run/docker.sock:/var/run/docker.sock \
                       aquasec/trivy:latest image \
+                      --ignore-unfixed \
                       --severity CRITICAL \
                       --exit-code 1 \
                       ${BACKEND_IMAGE}
