@@ -1,0 +1,73 @@
+services:
+  prod-db:
+    image: postgres:17
+    container_name: autoaudit-prod-db
+    environment:
+      POSTGRES_USER: autoaudit
+      POSTGRES_PASSWORD: autoaudit_prod_password
+      POSTGRES_DB: autoaudit_prod
+    volumes:
+      - prod_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autoaudit -d autoaudit_prod"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  prod-redis:
+    image: redis:alpine
+    container_name: autoaudit-prod-redis
+    volumes:
+      - prod_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  prod-opa:
+    image: openpolicyagent/opa:latest-debug
+    container_name: autoaudit-prod-opa
+    command: ["run", "--server", "--addr=0.0.0.0:8181", "--log-level=info", "/policies"]
+    volumes:
+      - ./engine/policies:/policies:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8181/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  prod-backend-api:
+    image: ${RELEASE_IMAGE}
+    container_name: autoaudit-prod-backend-api
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+asyncpg://autoaudit:autoaudit_prod_password@prod-db:5432/autoaudit_prod
+      SECRET_KEY: production-secret-key-change-in-real-deployments
+      BACKEND_PUBLIC_URL: http://localhost:8002
+      FRONTEND_URL: http://localhost:3000
+      GOOGLE_OAUTH_CLIENT_ID: ""
+      GOOGLE_OAUTH_CLIENT_SECRET: ""
+      REDIS_URL: redis://prod-redis:6379
+      OPA_URL: http://prod-opa:8181
+      ENCRYPTION_KEY: Ps-HiS3ww5QzQPc_Mdu5-JyA_jCNbdFHMdiwWSlAfgM=
+      POLICIES_DIR: /app/policies
+    volumes:
+      - ./engine/policies:/app/policies:ro
+    ports:
+      - "8002:8000"
+    depends_on:
+      prod-db:
+        condition: service_healthy
+      prod-redis:
+        condition: service_healthy
+      prod-opa:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  prod_postgres_data:
+  prod_redis_data:

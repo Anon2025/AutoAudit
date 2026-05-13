@@ -1,0 +1,74 @@
+services:
+  staging-db:
+    image: postgres:17
+    container_name: autoaudit-staging-db
+    environment:
+      POSTGRES_USER: autoaudit
+      POSTGRES_PASSWORD: autoaudit_staging_password
+      POSTGRES_DB: autoaudit_staging
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autoaudit -d autoaudit_staging"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  staging-redis:
+    image: redis:alpine
+    container_name: autoaudit-staging-redis
+    volumes:
+      - staging_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  staging-opa:
+    image: openpolicyagent/opa:latest-debug
+    container_name: autoaudit-staging-opa
+    command: ["run", "--server", "--addr=0.0.0.0:8181", "--log-level=info", "/policies"]
+    volumes:
+      - ./engine/policies:/policies:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8181/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  staging-backend-api:
+    image: ${BACKEND_IMAGE}
+    container_name: autoaudit-staging-backend-api
+    environment:
+      APP_ENV: staging
+      DATABASE_URL: postgresql+asyncpg://autoaudit:autoaudit_staging_password@staging-db:5432/autoaudit_staging
+      SECRET_KEY: staging-secret-key-change-in-real-deployments
+      BACKEND_PUBLIC_URL: http://localhost:8001
+      FRONTEND_URL: http://localhost:3000
+      GOOGLE_OAUTH_CLIENT_ID: ""
+      GOOGLE_OAUTH_CLIENT_SECRET: ""
+      REDIS_URL: redis://staging-redis:6379
+      OPA_URL: http://staging-opa:8181
+      ENCRYPTION_KEY: Ps-HiS3ww5QzQPc_Mdu5-JyA_jCNbdFHMdiwWSlAfgM=
+      POLICIES_DIR: /app/policies
+    volumes:
+      - ./engine/policies:/app/policies:ro
+    ports:
+      - "8001:8000"
+    depends_on:
+      staging-db:
+        condition: service_healthy
+      staging-redis:
+        condition: service_healthy
+      staging-opa:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  staging_postgres_data:
+  staging_redis_data:
+

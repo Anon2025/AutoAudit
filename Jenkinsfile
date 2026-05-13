@@ -45,98 +45,69 @@ GIT_COMMIT=${env.GIT_COMMIT}
                 }
             }
         }
+                             
+        stage('Testing Stage: Unit, Smoke, Integration') {
+            steps {
+                dir('backend-api') {
+                    sh '''
+                        rm -rf .venv
+                        python3 -m venv .venv
+                        . .venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements-test.txt
 
-        stage('Test Stage') {
-            stages {
-                stage('Unit Tests') {
-                    steps {
-                        dir('backend-api') {
-                            sh '''
-                                rm -rf .venv
-                                python3 -m venv .venv
-                                . .venv/bin/activate
-                                pip install --upgrade pip
-                                pip install -r requirements-test.txt
-                                pytest tests/unit -v \
-                                  --junitxml=test-results-unit.xml \
-                                  --cov=app.services.scan_readiness \
-                                  --cov-report=xml:coverage-unit.xml
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            junit allowEmptyResults: true, testResults: 'backend-api/test-results-unit.xml'
-                            archiveArtifacts artifacts: 'backend-api/coverage-unit.xml', allowEmptyArchive: true
-                        }
-                    }
+                        pytest tests/unit -v \
+                          --junitxml=test-results-unit.xml \
+                          --cov=app.services.scan_readiness \
+                          --cov-report=xml:coverage-unit.xml
+                    '''
                 }
+               
+                sh 'BACKEND_IMAGE=${BACKEND_IMAGE} docker compose -f docker-compose.test.yml down -v || true'
+                sh 'BACKEND_IMAGE=${BACKEND_IMAGE} docker compose -f docker-compose.test.yml up -d'                              
 
-             
-     		stage('Smoke Tests') {
-		    steps {
-			sh 'docker-compose --profile frontend-dev down -v || true'
-			sh 'docker-compose --profile frontend-dev up -d db redis opa backend-api'
+                sh '''
+                    echo "Waiting for backend API..."
+                    for i in $(seq 1 30); do
+                        if curl -fsS http://localhost:8000/ > /dev/null; then
+                            echo "Backend API is ready"
+                            exit 0
+                        fi
+                        sleep 2
+                    done
 
-			sh '''
-			    echo "Waiting for backend API..."
-			    for i in $(seq 1 30); do
-				if curl -fsS http://localhost:8000/ > /dev/null; then
-				    echo "Backend API is ready"
-				    exit 0
-				fi
-				sleep 2
-			    done
+                    echo "Backend API did not become ready in time"
+                    docker logs autoaudit-test-backend-api --tail=100 || true
+                    exit 1
+                '''
 
-			    echo "Backend API did not become ready in time"
-			    docker logs autoaudit-backend-api --tail=100 || true
-			    exit 1
-			'''
+                dir('backend-api') {
+                    sh '''
+                        . .venv/bin/activate
 
-			dir('backend-api') {
-			    sh '''
-				. .venv/bin/activate
-				API_BASE_URL=http://localhost:8000 \
-				pytest tests/smoke -v \
-				  --junitxml=test-results-smoke.xml
-			    '''
-			}
-		    }
-		    post {
-			always {
-			    junit allowEmptyResults: true, testResults: 'backend-api/test-results-smoke.xml'
-			    archiveArtifacts artifacts: 'backend-api/test-results-smoke.xml', allowEmptyArchive: true
-			}
-		    }
-		}
+                        API_BASE_URL=http://localhost:8000 \
+                        pytest tests/smoke -v \
+                          --junitxml=test-results-smoke.xml
 
-                stage('Integration Tests') {
-                    steps {
-                        dir('backend-api') {
-                            sh '''
-                                . .venv/bin/activate
-                                API_BASE_URL=http://localhost:8000 \
-                                pytest tests/integration -v \
-                                  --junitxml=test-results-integration.xml
-                            '''
-                        }
-                    }
-                    post {
-                        always {
-                            junit allowEmptyResults: true, testResults: 'backend-api/test-results-integration.xml'
-                            archiveArtifacts artifacts: 'backend-api/test-results-integration.xml', allowEmptyArchive: true
-                        }
-                    }
+                        API_BASE_URL=http://localhost:8000 \
+                        pytest tests/integration -v \
+                          --junitxml=test-results-integration.xml
+                    '''
                 }
             }
             post {
                 always {
-                    sh 'docker-compose --profile frontend-dev down -v || true'
+                    junit allowEmptyResults: true, testResults: 'backend-api/test-results-unit.xml'
+                    junit allowEmptyResults: true, testResults: 'backend-api/test-results-smoke.xml'
+                    junit allowEmptyResults: true, testResults: 'backend-api/test-results-integration.xml'
+
+		    archiveArtifacts artifacts: 'backend-api/coverage-unit.xml,backend-api/test-results-unit.xml,backend-api/test-results-smoke.xml,backend-api/test-results-integration.xml', allowEmptyArchive: true
+
+                    sh 'BACKEND_IMAGE=${BACKEND_IMAGE} docker compose -f docker-compose.test.yml down -v || true'
                 }
             }
         }
-               
-        
+
         stage('Code Quality Stage: SonarCloud Analysis') {
 	    steps {
 		withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
@@ -206,8 +177,57 @@ GIT_COMMIT=${env.GIT_COMMIT}
                     archiveArtifacts artifacts: 'backend-api/bandit-report.json,backend-api/pip-audit-report.json,trivy-image-report.json,trivy-image-report.txt', allowEmptyArchive: true
                 }
             }
-        }     
+        } 
+                
+        stage('Deploy Stage: Staging') {
+            steps {
+                sh '''
+                    export BACKEND_IMAGE=${BACKEND_IMAGE}
 
+                    docker compose -f docker-compose.staging.yml down || true
+                    docker compose -f docker-compose.staging.yml up -d
+
+                    echo "Waiting for staging API..."
+                    for i in $(seq 1 30); do
+                        if curl -fsS http://localhost:8001/ > /dev/null; then
+                            echo "Staging API is ready"
+                            exit 0
+                        fi
+                        sleep 2
+                    done
+
+                    echo "Staging API did not become ready in time"
+                    docker logs autoaudit-staging-backend-api --tail=100 || true
+                    exit 1
+                '''
+            }
+        }
+
+        stage('Release Stage: Production') {
+            steps {
+                sh '''
+                    export RELEASE_IMAGE=autoaudit-backend-api:release-${BUILD_NUMBER}
+
+                    docker tag ${BACKEND_IMAGE} ${RELEASE_IMAGE}
+
+                    docker compose -f docker-compose.prod.yml down || true
+                    docker compose -f docker-compose.prod.yml up -d
+
+                    echo "Waiting for production API..."
+                    for i in $(seq 1 30); do
+                        if curl -fsS http://localhost:8002/ > /dev/null; then
+                            echo "Production API is ready"
+                            exit 0
+                        fi
+                        sleep 2
+                    done
+
+                    echo "Production API did not become ready in time"
+                    docker logs autoaudit-prod-backend-api --tail=100 || true
+                    exit 1
+                '''
+            }
+        }
     }
 }
 

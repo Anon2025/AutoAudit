@@ -1,0 +1,70 @@
+services:
+  test-db:
+    image: postgres:17
+    container_name: autoaudit-test-db
+    environment:
+      POSTGRES_USER: autoaudit
+      POSTGRES_PASSWORD: autoaudit_test_password
+      POSTGRES_DB: autoaudit_test
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U autoaudit -d autoaudit_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  test-redis:
+    image: redis:alpine
+    container_name: autoaudit-test-redis
+    volumes:
+      - test_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  test-opa:
+    image: openpolicyagent/opa:latest-debug
+    container_name: autoaudit-test-opa
+    command: ["run", "--server", "--addr=0.0.0.0:8181", "--log-level=info", "/policies"]
+    volumes:
+      - ./engine/policies:/policies:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8181/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  test-backend-api:
+    image: ${BACKEND_IMAGE}
+    container_name: autoaudit-test-backend-api
+    environment:
+      APP_ENV: test
+      DATABASE_URL: postgresql+asyncpg://autoaudit:autoaudit_test_password@test-db:5432/autoaudit_test
+      SECRET_KEY: test-secret-key
+      BACKEND_PUBLIC_URL: http://localhost:8000
+      FRONTEND_URL: http://localhost:3000
+      GOOGLE_OAUTH_CLIENT_ID: ""
+      GOOGLE_OAUTH_CLIENT_SECRET: ""
+      REDIS_URL: redis://test-redis:6379
+      OPA_URL: http://test-opa:8181
+      ENCRYPTION_KEY: Ps-HiS3ww5QzQPc_Mdu5-JyA_jCNbdFHMdiwWSlAfgM=
+      POLICIES_DIR: /app/policies
+    volumes:
+      - ./engine/policies:/app/policies:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      test-db:
+        condition: service_healthy
+      test-redis:
+        condition: service_healthy
+      test-opa:
+        condition: service_healthy
+
+volumes:
+  test_postgres_data:
+  test_redis_data:
+
