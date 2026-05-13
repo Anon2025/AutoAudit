@@ -35,11 +35,11 @@ pipeline {
                     sh "docker image inspect ${env.BACKEND_IMAGE}"
 
                     writeFile file: 'build-metadata.txt', text: """
-IMAGE=${env.BACKEND_IMAGE}
-IMAGE_TAG=${env.IMAGE_TAG}
-BUILD_NUMBER=${env.BUILD_NUMBER}
-GIT_COMMIT=${env.GIT_COMMIT}
-"""
+		    IMAGE=${env.BACKEND_IMAGE}
+		    IMAGE_TAG=${env.IMAGE_TAG}
+		    BUILD_NUMBER=${env.BUILD_NUMBER}
+		    GIT_COMMIT=${env.GIT_COMMIT}
+		    """
 
                     archiveArtifacts artifacts: 'build-metadata.txt', fingerprint: true
                 }
@@ -251,6 +251,29 @@ GIT_COMMIT=${env.GIT_COMMIT}
 		archiveArtifacts artifacts: 'release-production-metadata.txt', fingerprint: true
             }
         }
+
+        stage('Monitoring Stage: New Relic') {
+	    steps {
+		withCredentials([string(credentialsId: 'NEW_RELIC_LICENSE_KEY', variable: 'NEW_RELIC_LICENSE_KEY')]) {
+		    sh '''
+		        docker compose -f docker-compose.monitoring.yml up -d
+
+		        echo "Waiting for New Relic infrastructure agent..."
+		        for i in $(seq 1 15); do
+		            if docker ps --format '{{.Names}}' | grep -q '^autoaudit-newrelic-infra$'; then
+		                echo "New Relic agent container is running"
+		                exit 0
+		            fi
+		            sleep 2
+		        done
+
+		        echo "New Relic infrastructure agent did not start"
+		        docker logs autoaudit-newrelic-infra --tail=100 || true
+		        exit 1
+		    '''
+		}
+	    }
+	}
     }
 }
 
