@@ -128,7 +128,7 @@ GIT_COMMIT=${env.GIT_COMMIT}
                         }
                     }
                 }
-            }s
+            }
             post {
                 always {
                     sh 'docker-compose --profile frontend-dev down -v || true'
